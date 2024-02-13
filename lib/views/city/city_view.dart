@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/city_model.dart';
+import '../home/home_view.dart';
 import 'widgets/trip_activity_list.dart';
 import 'widgets/activity_list.dart';
 import 'widgets/trip_overview.dart';
@@ -8,7 +9,7 @@ import '../../models/activity_model.dart';
 import '../../models/trip_model.dart';
 
 class CityView extends StatefulWidget {
-  static String routeName = '/city';
+  static const String routeName = '/city';
   final List<Activity> activities = data.activities;
   final City city;
 
@@ -23,17 +24,25 @@ class _CityViewState extends State<CityView> {
   late int index;
   late List<Activity> activities;
 
+  List<Activity> get tripActivities {
+    return widget.activities
+        .where((activity) => mytrip.activities.contains(activity.id))
+        .toList();
+  }
+
+  double get amount {
+    return mytrip.activities.fold(0.0, (acc, cur) {
+      final activity =
+          widget.activities.firstWhere((activity) => activity.id == cur);
+      return acc + activity.price;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     mytrip = Trip(activities: [], city: 'Paris', date: null);
     index = 0;
-  }
-
-  List<Activity> get tripActivities {
-    return widget.activities
-        .where((activity) => mytrip.activities.contains(activity.id))
-        .toList();
   }
 
   void setDate() {
@@ -71,6 +80,46 @@ class _CityViewState extends State<CityView> {
     });
   }
 
+  void saveTrip() async {
+    final result = await showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Voulez-vous sauvegarder ?'),
+        contentPadding: const EdgeInsets.all(20),
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor),
+                onPressed: () {
+                  Navigator.pop(context, 'save');
+                },
+                child: const Text(
+                  'Sauvegarder',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              ElevatedButton(
+                child: const Text('Annuler'),
+                onPressed: () {
+                  Navigator.pop(context, 'cancel');
+                },
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+    if (mounted) Navigator.pushNamed(context, HomeView.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,23 +132,27 @@ class _CityViewState extends State<CityView> {
       body: Column(
         children: <Widget>[
           TripOverview(
-            mytrip: mytrip,
-            setDate: setDate,
-            cityName: widget.city.name,
-          ),
+              mytrip: mytrip,
+              setDate: setDate,
+              cityName: widget.city.name,
+              amount: amount),
           Expanded(
             child: index == 0
                 ? ActivityList(
-              activities: widget.activities,
-              selectedActivities: mytrip.activities,
-              toggleActivity: toggleActivity,
-            )
+                    activities: widget.activities,
+                    selectedActivities: mytrip.activities,
+                    toggleActivity: toggleActivity,
+                  )
                 : TripActivityList(
-              activities: tripActivities,
-              deleteTripActivity: deleteTripActivity,
-            ),
+                    activities: tripActivities,
+                    deleteTripActivity: deleteTripActivity,
+                  ),
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: saveTrip,
+        child: const Icon(Icons.forward),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
