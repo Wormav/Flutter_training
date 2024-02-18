@@ -26,13 +26,15 @@ class TripActivityList extends StatelessWidget {
               ),
               onPressed: () {
                 deleteTripActivity(activity.id);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Activitée supprimée'),
-                    backgroundColor: Colors.red,
-                    duration: Duration(seconds: 1),
-                  ),
-                );
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(
+                      content: Text('Activitée supprimée'),
+                      backgroundColor: Colors.red,
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
               },
             ),
           ),

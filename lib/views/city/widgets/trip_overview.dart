@@ -8,13 +8,7 @@ class TripOverview extends StatelessWidget {
   final String cityName;
   final double amount;
 
-  const TripOverview({
-    super.key,
-    required this.setDate,
-    required this.mytrip,
-    required this.cityName,
-    required this.amount,
-  });
+  const TripOverview({super.key, required this.setDate, required this.mytrip, required this.cityName, required this.amount});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +19,7 @@ class TripOverview extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       height: 200,
       width:
-          orientation == Orientation.landscape ? size.width * 0.5 : size.width,
+      orientation == Orientation.landscape ? size.width * 0.5 : size.width,
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
